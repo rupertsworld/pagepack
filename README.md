@@ -12,6 +12,8 @@ pagepack [input-dir] --out-dir [output target] --public-dir [public files]
 
 Output directory defaults to `dist`, public directory defaults to `public`.
 
+To watch the folder & start a live server, install `live-server` and `nodemon`, then run (or add to your scripts):
+
 ```
-nodemon --exec 'npx pagepack' & live-server dist
+nodemon --ignore ./dist --ext '*' --exec 'npx pagepack' & live-server dist
 ```
