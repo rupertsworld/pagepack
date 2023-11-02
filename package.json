@@ -1,0 +1,15 @@
+{
+  "name": "pagepack",
+  "version": "0.0.1",
+  "description": "",
+  "main": "cli.js",
+  "type": "module",
+  "bin": {
+    "pagepack": "cli.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Rupert Manfredi <mail@ruperts.world>",
+  "license": "MIT"
+}
