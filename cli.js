@@ -6,17 +6,32 @@ import deindent from './deindent.js';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
-const inputDirectory = process.argv[2];
+const inputDirectory = process.argv[2] ? process.argv[2] : 'pages';
 const args = process.argv.slice(3);
 
-// Default values
+// Get the index of '--out-dir' and '--public-dir' arguments in the process.argv array
+const outDirIndex = process.argv.indexOf('--out-dir');
+const publicDirIndex = process.argv.indexOf('--public-dir');
+
+// Set default values
 let outputDirectory = 'dist';
 let publicDirectory = 'public';
 
+// Check if '--out-dir' argument exists and retrieve its value
+if (outDirIndex !== -1 && process.argv.length > outDirIndex + 1) {
+  outputDirectory = process.argv[outDirIndex + 1];
+}
+
+// Check if '--public-dir' argument exists and retrieve its value
+if (publicDirIndex !== -1 && process.argv.length > publicDirIndex + 1) {
+  publicDirectory = process.argv[publicDirIndex + 1];
+}
+
+console.log('Starting pagepack...');
+
 const createDistDirectory = async () => {
   try {
-    await fs.rmdir(outputDirectory, { recursive: true });
-    console.log(`'dist' directory deleted successfully.`);
+    await fs.rm(outputDirectory, { recursive: true });
   } catch (error) {
     if (error.code !== 'ENOENT') {
       console.error('Error deleting "dist" directory:', error);
@@ -31,12 +46,9 @@ const copyPublicFilesToDist = async () => {
     if (publicDirExists) {
       await fs.mkdir(outputDirectory, { recursive: true });
       await copyFolder(publicDirectory, outputDirectory);
-      console.log(`'public' folder copied to 'dist' directory successfully.`);
+      console.log(`- Updated public pages.`);
     } else {
       await fs.mkdir(outputDirectory);
-      console.log(
-        `'dist' directory created successfully as 'public' folder does not exist.`
-      );
     }
   } catch (error) {
     console.error('Error copying files from public to dist:', error);
@@ -97,9 +109,7 @@ const processDirectory = async (directory, currentPath = '') => {
           const result = moduleFunction();
           await fs.mkdir(path.dirname(outputPath), { recursive: true });
           await fs.writeFile(outputPath, deindent(result));
-          console.log(
-            `Processed ${itemPath} and saved result to ${outputPath}`
-          );
+          console.log(`- ${itemPath} -> ${outputPath}`);
         } catch (error) {
           console.error(`Error processing ${itemPath}: ${error}`);
         }
@@ -129,6 +139,7 @@ const main = async () => {
   }
 
   await processDirectory(inputDirectory);
+  console.log('✨ Your website is ready.');
 };
 
 main();
